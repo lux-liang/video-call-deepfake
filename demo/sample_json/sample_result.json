@@ -1,74 +1,119 @@
 {
   "meeting_id": "meeting_demo_001",
-  "status": "completed",
-  "confidence": 0.78,
+  "status": "degraded",
+  "confidence": 0.72,
   "participants": [
     {
       "participant_id": "p_001",
       "display_name": "Alice",
       "role": "host",
-      "dominant_risk_level": "high",
-      "notes": "Repeated lip-sync mismatch around speaking turns."
+      "track_ref": "video_track_1",
+      "dominant_risk_level": "medium",
+      "notes": "Frequent response latency spikes and repeated mouth-onset mismatches during named responses.",
+      "metadata": {
+        "seat_hint": "top-left",
+        "speaker_label": "Speaker A"
+      }
     },
     {
       "participant_id": "p_002",
       "display_name": "Bob",
       "role": "guest",
+      "track_ref": "video_track_2",
       "dominant_risk_level": "low",
-      "notes": "No high-severity anomaly cluster detected."
+      "notes": "Stable speaking cadence with no high-severity event cluster.",
+      "metadata": {
+        "seat_hint": "top-right",
+        "speaker_label": "Speaker B"
+      }
     }
   ],
   "events": [
     {
       "event_id": "evt_001",
       "participant_id": "p_001",
-      "timestamp_start": 42.5,
-      "timestamp_end": 49.0,
-      "event_type": "lip_sync_mismatch",
-      "severity": "high",
-      "summary": "Visible mouth motion diverges from detected speech.",
+      "timestamp_start": 11.8,
+      "timestamp_end": 13.2,
+      "event_type": "speaker_switch",
+      "severity": "medium",
+      "summary": "Active speaker switches from Bob to Alice before Alice begins a delayed named response.",
       "evidence_refs": [
-        "frame:001240",
-        "audio:seg_014"
+        "speaker_turn:turn_004",
+        "audio:seg_004"
       ]
     },
     {
       "event_id": "evt_002",
       "participant_id": "p_001",
-      "timestamp_start": 120.0,
-      "timestamp_end": 128.0,
-      "event_type": "face_boundary_instability",
-      "severity": "medium",
-      "summary": "Face boundary jitter increases during head turns.",
+      "timestamp_start": 13.2,
+      "timestamp_end": 17.0,
+      "event_type": "named_response",
+      "severity": "high",
+      "summary": "Alice responds after being directly addressed, with visible mouth-onset lag and elevated response latency.",
       "evidence_refs": [
-        "frame:003100"
+        "transcript:line_021",
+        "frame:000396"
+      ]
+    },
+    {
+      "event_id": "evt_003",
+      "participant_id": "p_002",
+      "timestamp_start": 58.0,
+      "timestamp_end": 60.5,
+      "event_type": "screen_share_change",
+      "severity": "low",
+      "summary": "Screen-share toggles from slides to browser while Bob remains the active speaker.",
+      "evidence_refs": [
+        "screen_share:state_002",
+        "frame:001740"
+      ]
+    },
+    {
+      "event_id": "evt_004",
+      "participant_id": "p_001",
+      "timestamp_start": 88.4,
+      "timestamp_end": 91.0,
+      "event_type": "named_response",
+      "severity": "medium",
+      "summary": "A second named response from Alice shows head pose change before speech onset, but with lower confidence due to mock fallback.",
+      "evidence_refs": [
+        "transcript:line_054",
+        "frame:002652"
       ]
     }
   ],
   "responses": [
     {
       "response_id": "resp_001",
-      "kind": "explanation",
-      "source": "mock_rule_engine",
-      "summary": "Participant p_001 shows clustered multimodal inconsistencies.",
-      "confidence": 0.74
+      "kind": "behavior_summary",
+      "source": "heuristic_behavior_extractor",
+      "summary": "Alice shows repeated mouth onset lag, abrupt head pose change near response start, and slower-than-baseline named response latency.",
+      "confidence": 0.76
     },
     {
       "response_id": "resp_002",
+      "kind": "explanation",
+      "source": "rule_engine",
+      "summary": "Risk is concentrated around Alice's named responses rather than across the full meeting, so the result is degraded but still actionable for review.",
+      "confidence": 0.72
+    },
+    {
+      "response_id": "resp_003",
       "kind": "fallback_notice",
-      "source": "phase1_bootstrap",
-      "summary": "Result generated from sample/mock pipeline output.",
-      "confidence": 0.55
+      "source": "phase1_mock_pipeline",
+      "summary": "Frame parsing and behavior extraction partially used deterministic mock heuristics because no real video feature stack was available.",
+      "confidence": 0.62
     }
   ],
   "risk_scores": [
     {
       "participant_id": "p_001",
-      "score": 0.81,
-      "level": "high",
+      "score": 0.74,
+      "level": "medium",
       "reasons": [
-        "multiple lip-sync mismatches",
-        "face boundary instability"
+        "repeated mouth onset lag during named responses",
+        "head pose change near speech onset",
+        "response latency above meeting baseline"
       ]
     },
     {
@@ -76,63 +121,102 @@
       "score": 0.18,
       "level": "low",
       "reasons": [
-        "no sustained anomaly cluster"
+        "stable speaker-switch behavior",
+        "no suspicious response-latency cluster"
       ]
     }
   ],
   "suspicious_segments": [
     {
       "segment_id": "seg_001",
-      "timestamp_start": 42.5,
-      "timestamp_end": 61.0,
+      "timestamp_start": 11.8,
+      "timestamp_end": 17.0,
       "participant_ids": [
         "p_001"
       ],
-      "reason": "Clustered audio-visual inconsistency around active speech.",
-      "confidence": 0.79
+      "reason": "Speaker switch into a delayed named response with mouth onset mismatch and elevated latency.",
+      "confidence": 0.78
+    },
+    {
+      "segment_id": "seg_002",
+      "timestamp_start": 88.4,
+      "timestamp_end": 91.0,
+      "participant_ids": [
+        "p_001"
+      ],
+      "reason": "Head pose change immediately before a named response, retained with degraded confidence because the segment uses fallback behavior features.",
+      "confidence": 0.61
     }
   ],
   "tool_logs": [
     {
-      "tool_name": "ffmpeg",
-      "status": "success",
+      "tool_name": "ffmpeg_probe",
+      "status": "mocked",
       "started_at": "2026-04-20T00:00:00Z",
-      "ended_at": "2026-04-20T00:00:06Z",
-      "summary": "Extracted audio track and sampled frames.",
+      "ended_at": "2026-04-20T00:00:01Z",
+      "summary": "Synthetic frame index generated for sample meeting because no input video path was provided.",
       "artifacts": [
-        "outputs/meeting_demo_001/audio.wav",
-        "outputs/meeting_demo_001/frames/"
+        "demo/sample_json/sample_result.json"
       ]
     },
     {
-      "tool_name": "mediapipe",
-      "status": "mocked",
-      "started_at": "2026-04-20T00:00:06Z",
-      "ended_at": "2026-04-20T00:00:08Z",
-      "summary": "Phase 1 mock landmark pass for contract validation.",
-      "artifacts": []
+      "tool_name": "event_detector",
+      "status": "success",
+      "started_at": "2026-04-20T00:00:01Z",
+      "ended_at": "2026-04-20T00:00:02Z",
+      "summary": "Detected P0 event classes: speaker switch, named response, and screen-share change.",
+      "artifacts": [
+        "outputs/meeting_demo_001/events.json"
+      ]
+    },
+    {
+      "tool_name": "behavior_extractor",
+      "status": "degraded",
+      "started_at": "2026-04-20T00:00:02Z",
+      "ended_at": "2026-04-20T00:00:03Z",
+      "summary": "Mouth onset, head pose change, and response latency were derived from heuristics instead of real landmarks.",
+      "artifacts": [
+        "outputs/meeting_demo_001/behavior.json"
+      ]
+    },
+    {
+      "tool_name": "risk_scorer",
+      "status": "success",
+      "started_at": "2026-04-20T00:00:03Z",
+      "ended_at": "2026-04-20T00:00:03Z",
+      "summary": "Applied deterministic rule weights to participant-level behavior signals.",
+      "artifacts": [
+        "outputs/meeting_demo_001/risk.json"
+      ]
     }
   ],
   "report_summary": {
-    "headline": "Alice flagged with elevated synthetic-behavior risk.",
-    "overview": "The sample analysis identified clustered lip-sync mismatch and face boundary instability around Alice's speaking turns.",
+    "headline": "Alice is flagged for medium synthetic-behavior risk concentrated around direct responses.",
+    "overview": "The sample pipeline found two suspicious segments where Alice answered by name with slower-than-baseline response latency, mouth onset lag, and one abrupt head pose change. Screen-share changes and Bob's turns remained low risk.",
     "recommended_actions": [
-      "Request manual reviewer confirmation.",
-      "Compare with trusted identity reference footage."
+      "Route Alice's flagged response segments to manual review.",
+      "Compare the named-response segments against a trusted identity reference clip.",
+      "Re-run with a real video path to replace heuristic behavior features."
     ]
   },
   "validation": {
     "schema_valid": true,
     "missing_fields": [],
     "warnings": [
-      "Sample/mock output used in Phase 1 bootstrap."
+      "Behavior features were produced by heuristic fallback logic.",
+      "Sample output is deterministic and intended for Phase 1 demo playback."
     ],
-    "validator_version": "phase1"
+    "validator_version": "phase1.pipeline.v1"
   },
   "fallback": {
     "mode": "mock",
-    "reason": "Real pipeline not connected yet.",
-    "degraded_fields": [],
+    "reason": "Real frame and landmark extraction are not connected in Phase 1, so the pipeline uses stable deterministic heuristics and sample data.",
+    "degraded_fields": [
+      "participants[].notes",
+      "responses[]",
+      "risk_scores[]",
+      "suspicious_segments[]"
+    ],
     "used_sample": true
   }
 }
