@@ -15,6 +15,16 @@
 - 不将产品设计成聊天网页。
 - 优先实现 workflow 面板：上传、任务状态、结果视图、日志视图。
 - 显示 `status`、`confidence` 和 degraded 提示。
+- 页面首屏必须能一眼看出这是风险巡检 workspace，而不是普通聊天页面。
+- 至少要有 participant 风险卡片、suspicious segment、event 列表、tool logs、report summary 五个信息区块。
+- `validation` 与 `fallback` 至少要有明显的状态提示位，不要藏在浏览器控制台。
+
+## 录屏与截图建议
+
+- 首页或 workspace 首屏：展示上传区、任务状态和风险概览。
+- 结果页截图一：participant 风险卡片 + suspicious segment。
+- 结果页截图二：tool logs + report summary。
+- 录屏时优先从整体工作流切入，不要把镜头停在纯样式调试或聊天组件上。
 
 ## 非目标
 

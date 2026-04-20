@@ -118,6 +118,18 @@
     "headline": "string",
     "overview": "string",
     "recommended_actions": []
+  },
+  "validation": {
+    "schema_valid": true,
+    "missing_fields": [],
+    "warnings": [],
+    "validator_version": "phase1"
+  },
+  "fallback": {
+    "mode": "mock",
+    "reason": "real pipeline not connected",
+    "degraded_fields": [],
+    "used_sample": true
   }
 }
 ```
@@ -198,9 +210,24 @@
 - `summary`
 - `artifacts[]`
 
+### `validation`
+
+- `schema_valid`
+- `missing_fields[]`
+- `warnings[]`
+- `validator_version`
+
+### `fallback`
+
+- `mode`
+- `reason`
+- `degraded_fields[]`
+- `used_sample`
+
 ## 前端兼容要求
 
 - 前端只依赖已列出的稳定字段。
 - 若数组字段缺失，backend 必须返回空数组而不是省略。
 - 若结果是降级或 mock，`status` 与 `responses` 中必须显式说明。
 - `confidence` 必须始终存在，哪怕仅为低置信 mock 值。
+- `validation` 与 `fallback` 属于稳定顶层字段，前端至少应将其用于状态说明、降级提示或验收展示。
